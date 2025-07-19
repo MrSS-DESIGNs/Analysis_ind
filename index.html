@@ -1,1 +1,2961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Pro - Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+            line-height: 1.5;
+        }
+        
+        /* Header Styles */
+        .header {
+            background: white;
+            height: 64px;
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2563eb;
+            margin-right: 48px;
+        }
+        
+        .search-bar {
+            flex: 1;
+            max-width: 400px;
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 8px 16px 8px 40px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: #f9fafb;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+        
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1001;
+            display: none;
+        }
+        
+        .search-result-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f3f4f6;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .search-result-item:hover {
+            background: #f8fafc;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-left: auto;
+        }
+        
+        .notification-btn, .settings-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: none;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            position: relative;
+        }
+        
+        .notification-btn:hover, .settings-btn:hover {
+            background: #f1f5f9;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            background: #dc2626;
+            border-radius: 50%;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            position: relative;
+        }
+        
+        .user-profile:hover {
+            background: #f1f5f9;
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #2563eb;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        /* Dropdown Menus */
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-width: 200px;
+            z-index: 1001;
+            display: none;
+        }
+        
+        .dropdown.show {
+            display: block;
+        }
+        
+        .dropdown-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f3f4f6;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #374151;
+            text-decoration: none;
+        }
+        
+        .dropdown-item:hover {
+            background: #f8fafc;
+        }
+        
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        /* Notification Panel */
+        .notification-panel {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 350px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 1001;
+            display: none;
+        }
+        
+        .notification-header {
+            padding: 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-weight: 600;
+        }
+        
+        .notification-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .notification-item {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            gap: 12px;
+        }
+        
+        .notification-item.unread {
+            background: #f0f9ff;
+        }
+        
+        .notification-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        
+        .notification-icon.info {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        
+        .notification-icon.success {
+            background: #d1fae5;
+            color: #059669;
+        }
+        
+        .notification-icon.warning {
+            background: #fed7aa;
+            color: #d97706;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 64px;
+            bottom: 0;
+            width: 240px;
+            background: #f8fafc;
+            border-right: 1px solid #e2e8f0;
+            padding: 24px 0;
+            overflow-y: auto;
+            z-index: 900;
+            transition: transform 0.3s ease;
+        }
+        
+        .sidebar.collapsed {
+            transform: translateX(-240px);
+        }
+        
+        .nav-section {
+            margin-bottom: 32px;
+        }
+        
+        .nav-title {
+            padding: 0 24px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            color: #64748b;
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background: #e2e8f0;
+            color: #334155;
+        }
+        
+        .nav-item.active {
+            background: #dbeafe;
+            color: #2563eb;
+            border-left-color: #2563eb;
+            font-weight: 500;
+        }
+        
+        .nav-item i {
+            width: 20px;
+            margin-right: 12px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            margin-left: 240px;
+            margin-top: 64px;
+            padding: 24px;
+            min-height: calc(100vh - 64px);
+            transition: margin-left 0.3s ease;
+        }
+        
+        .main-content.expanded {
+            margin-left: 0;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        
+        .page-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #64748b;
+            border: 1px solid #d1d5db;
+        }
+        
+        .btn-secondary:hover {
+            background: #f8fafc;
+        }
+        
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+        }
+        
+        .modal {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 20px 25px rgba(0,0,0,0.15);
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #9ca3af;
+        }
+        
+        .modal-body {
+            padding: 24px;
+        }
+        
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .kpi-card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .kpi-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        
+        .kpi-title {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 500;
+        }
+        
+        .kpi-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .kpi-icon.blue {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        
+        .kpi-icon.green {
+            background: #d1fae5;
+            color: #059669;
+        }
+        
+        .kpi-icon.orange {
+            background: #fed7aa;
+            color: #d97706;
+        }
+        
+        .kpi-icon.red {
+            background: #fecaca;
+            color: #dc2626;
+        }
+        
+        .kpi-icon.purple {
+            background: #e9d5ff;
+            color: #7c3aed;
+        }
+        
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+        
+        .kpi-change {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .kpi-change.positive {
+            color: #059669;
+        }
+        
+        .kpi-change.negative {
+            color: #dc2626;
+        }
+        
+        .kpi-change i {
+            margin-right: 4px;
+        }
+        
+        .kpi-card .delete-widget {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: rgba(220, 38, 38, 0.1);
+            color: #dc2626;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .kpi-card:hover .delete-widget {
+            opacity: 1;
+        }
+        
+        /* Charts Grid */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .chart-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .chart-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .chart-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .chart-body {
+            padding: 24px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        
+        /* Data Table */
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .table-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .table-search {
+            position: relative;
+            width: 300px;
+        }
+        
+        .table-search input {
+            width: 100%;
+            padding: 8px 16px 8px 36px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .table-search i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background: #f8fafc;
+            padding: 12px 24px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .data-table th:hover {
+            background: #f1f5f9;
+        }
+        
+        .data-table th .sort-arrow {
+            position: absolute;
+            right: 8px;
+            opacity: 0.5;
+            font-size: 12px;
+        }
+        
+        .data-table td {
+            padding: 16px 24px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .data-table tr:hover {
+            background: #f8fafc;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-badge.active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-badge.inactive {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .status-badge.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        /* Content Sections */
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        /* Settings Panel */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        
+        .settings-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 24px;
+        }
+        
+        .settings-card-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        /* Reports Grid */
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+        
+        .report-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .report-preview {
+            height: 120px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .report-icon {
+            font-size: 32px;
+            color: white;
+            opacity: 0.8;
+        }
+        
+        .report-content {
+            padding: 20px;
+        }
+        
+        .report-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+        
+        .report-description {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        
+        .report-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        /* Success/Error Messages */
+        .toast {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 16px;
+            z-index: 2001;
+            max-width: 300px;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast.success {
+            border-left: 4px solid #059669;
+        }
+        
+        .toast.error {
+            border-left: 4px solid #dc2626;
+        }
+        
+        .toast.info {
+            border-left: 4px solid #2563eb;
+        }
+        
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: none;
+            font-size: 18px;
+            cursor: pointer;
+            margin-right: 16px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .logo {
+                margin-right: 16px;
+            }
+            
+            .search-bar {
+                display: none;
+            }
+            
+            .sidebar {
+                transform: translateX(-240px);
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+            
+            .header-actions {
+                gap: 8px;
+            }
+            
+            .user-profile span {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 16px;
+            }
+            
+            .kpi-card {
+                padding: 20px;
+            }
+            
+            .chart-body {
+                padding: 16px;
+            }
+            
+            .table-search {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <div class="logo">
+            <i class="fas fa-chart-line"></i> Analytics Pro India
+        </div>
+        
+        <div class="search-bar">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" placeholder="Search users, reports, analytics..." oninput="performSearch(this.value)">
+            <div class="search-results" id="searchResults"></div>
+        </div>
+        
+        <div class="header-actions">
+            <button class="notification-btn" onclick="toggleNotifications()">
+                <i class="fas fa-bell"></i>
+                <div class="notification-badge" id="notificationBadge"></div>
+            </button>
+            
+            <button class="settings-btn" onclick="showSection('settings')">
+                <i class="fas fa-cog"></i>
+            </button>
+            
+            <div class="user-profile" onclick="toggleUserMenu()">
+                <div class="user-avatar">AD</div>
+                <span>Arjun Desai</span>
+                <i class="fas fa-chevron-down" style="font-size: 12px; color: #9ca3af;"></i>
+            </div>
+        </div>
+        
+        <!-- Notification Panel -->
+        <div class="notification-panel" id="notificationPanel">
+            <div class="notification-header">
+                <span>Notifications</span>
+                <button onclick="markAllAsRead()" style="background: none; border: none; color: #2563eb; cursor: pointer;">Mark all as read</button>
+            </div>
+            <div class="notification-list" id="notificationList">
+                <div class="notification-item unread">
+                    <div class="notification-icon success">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: 500;">New user registered</div>
+                        <div style="font-size: 12px; color: #64748b;">Priya Sharma joined the platform</div>
+                        <div style="font-size: 12px; color: #9ca3af;">2 minutes ago</div>
+                    </div>
+                </div>
+                <div class="notification-item unread">
+                    <div class="notification-icon info">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: 500;">Revenue milestone reached</div>
+                        <div style="font-size: 12px; color: #64748b;">Monthly revenue crossed ₹10 lakhs</div>
+                        <div style="font-size: 12px; color: #9ca3af;">15 minutes ago</div>
+                    </div>
+                </div>
+                <div class="notification-item">
+                    <div class="notification-icon warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: 500;">System update available</div>
+                        <div style="font-size: 12px; color: #64748b;">New features and security updates</div>
+                        <div style="font-size: 12px; color: #9ca3af;">1 hour ago</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User Profile Dropdown -->
+        <div class="dropdown" id="userDropdown">
+            <a href="#" class="dropdown-item" onclick="openProfileModal()">
+                <i class="fas fa-user"></i>
+                Profile Settings
+            </a>
+            <a href="#" class="dropdown-item" onclick="openPreferencesModal()">
+                <i class="fas fa-cog"></i>
+                Preferences
+            </a>
+            <a href="#" class="dropdown-item" onclick="toggleDarkMode()">
+                <i class="fas fa-moon"></i>
+                Dark Mode
+            </a>
+            <a href="#" class="dropdown-item" onclick="showHelp()">
+                <i class="fas fa-question-circle"></i>
+                Help & Support
+            </a>
+            <a href="#" class="dropdown-item" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </a>
+        </div>
+    </header>
+    
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="nav-section">
+            <div class="nav-title">Main Dashboard</div>
+            <a href="#" class="nav-item active" onclick="showSection('overview')">
+                <i class="fas fa-home"></i>
+                Overview
+            </a>
+            <a href="#" class="nav-item" onclick="showSection('analytics')">
+                <i class="fas fa-chart-bar"></i>
+                Analytics
+            </a>
+            <a href="#" class="nav-item" onclick="showSection('reports')">
+                <i class="fas fa-file-alt"></i>
+                Reports
+            </a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-title">Management</div>
+            <a href="#" class="nav-item" onclick="showSection('users')">
+                <i class="fas fa-users"></i>
+                User Management
+            </a>
+            <a href="#" class="nav-item" onclick="showSection('settings')">
+                <i class="fas fa-cog"></i>
+                Settings
+            </a>
+        </div>
+        
+        <div class="nav-section">
+            <div class="nav-title">Tools</div>
+            <a href="#" class="nav-item" onclick="exportData()">
+                <i class="fas fa-download"></i>
+                Export Data
+            </a>
+            <a href="#" class="nav-item" onclick="openImportModal()">
+                <i class="fas fa-upload"></i>
+                Import Data
+            </a>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Overview Section -->
+        <div id="overview-section" class="content-section active">
+            <div class="page-header">
+                <h1 class="page-title">Dashboard Overview</h1>
+                <div class="page-actions">
+                    <button class="btn btn-secondary" onclick="exportDashboard()">
+                        <i class="fas fa-download"></i> Export Dashboard
+                    </button>
+                    <button class="btn btn-primary" onclick="openAddWidgetModal()">
+                        <i class="fas fa-plus"></i> Add Widget
+                    </button>
+                </div>
+            </div>
+            
+            <!-- KPI Cards -->
+            <div class="kpi-grid" id="kpiGrid">
+                <div class="kpi-card" data-widget="users">
+                    <button class="delete-widget" onclick="deleteWidget('users')">×</button>
+                    <div class="kpi-header">
+                        <div class="kpi-title">Total Users</div>
+                        <div class="kpi-icon blue">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="kpi-value" id="totalUsers">2,45,670</div>
+                    <div class="kpi-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +12.5% vs last month
+                    </div>
+                </div>
+                
+                <div class="kpi-card" data-widget="revenue">
+                    <button class="delete-widget" onclick="deleteWidget('revenue')">×</button>
+                    <div class="kpi-header">
+                        <div class="kpi-title">Revenue</div>
+                        <div class="kpi-icon green">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                    </div>
+                    <div class="kpi-value" id="revenue">₹8,94,320</div>
+                    <div class="kpi-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +8.2% vs last month
+                    </div>
+                </div>
+                
+                <div class="kpi-card" data-widget="conversion">
+                    <button class="delete-widget" onclick="deleteWidget('conversion')">×</button>
+                    <div class="kpi-header">
+                        <div class="kpi-title">Conversion Rate</div>
+                        <div class="kpi-icon orange">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                    </div>
+                    <div class="kpi-value" id="conversionRate">3.42%</div>
+                    <div class="kpi-change negative">
+                        <i class="fas fa-arrow-down"></i>
+                        -1.8% vs last month
+                    </div>
+                </div>
+                
+                <div class="kpi-card" data-widget="bounce">
+                    <button class="delete-widget" onclick="deleteWidget('bounce')">×</button>
+                    <div class="kpi-header">
+                        <div class="kpi-title">Bounce Rate</div>
+                        <div class="kpi-icon red">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                    <div class="kpi-value" id="bounceRate">42.1%</div>
+                    <div class="kpi-change positive">
+                        <i class="fas fa-arrow-down"></i>
+                        -5.3% vs last month
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">Traffic Overview</div>
+                        <div class="chart-actions">
+                            <select onchange="updateTrafficChart(this.value)" style="padding: 4px 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+                                <option value="30">Last 30 Days</option>
+                                <option value="7">Last 7 Days</option>
+                                <option value="90">Last 90 Days</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="chart-body">
+                        <div class="chart-container">
+                            <canvas id="trafficChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">User Sources</div>
+                        <div class="chart-actions">
+                            <button class="btn btn-secondary" onclick="refreshSourceChart()" style="font-size: 12px; padding: 4px 8px;">
+                                <i class="fas fa-sync"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-body">
+                        <div class="chart-container">
+                            <canvas id="sourceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Data Table -->
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">Recent Activities</div>
+                    <div class="table-search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search activities..." onkeyup="searchTable(this.value)">
+                    </div>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)">User <i class="fas fa-sort sort-arrow"></i></th>
+                            <th onclick="sortTable(1)">Action <i class="fas fa-sort sort-arrow"></i></th>
+                            <th onclick="sortTable(2)">Date <i class="fas fa-sort sort-arrow"></i></th>
+                            <th onclick="sortTable(3)">Status <i class="fas fa-sort sort-arrow"></i></th>
+                            <th onclick="sortTable(4)">Value <i class="fas fa-sort sort-arrow"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody id="activityTableBody">
+                        <tr>
+                            <td>Rajesh Kumar</td>
+                            <td>Purchase</td>
+                            <td>2025-07-19 14:32</td>
+                            <td><span class="status-badge active">Completed</span></td>
+                            <td>₹14,999</td>
+                        </tr>
+                        <tr>
+                            <td>Priya Sharma</td>
+                            <td>Sign Up</td>
+                            <td>2025-07-19 14:28</td>
+                            <td><span class="status-badge active">Active</span></td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>Vikram Singh</td>
+                            <td>Login</td>
+                            <td>2025-07-19 14:25</td>
+                            <td><span class="status-badge active">Active</span></td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td>Anita Patel</td>
+                            <td>Purchase</td>
+                            <td>2025-07-19 14:20</td>
+                            <td><span class="status-badge inactive">Failed</span></td>
+                            <td>₹8,999</td>
+                        </tr>
+                        <tr>
+                            <td>Suresh Gupta</td>
+                            <td>Registration</td>
+                            <td>2025-07-19 14:15</td>
+                            <td><span class="status-badge pending">Pending</span></td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Analytics Section -->
+        <div id="analytics-section" class="content-section">
+            <div class="page-header">
+                <h1 class="page-title">Advanced Analytics</h1>
+                <div class="page-actions">
+                    <button class="btn btn-secondary" onclick="exportAnalytics()">
+                        <i class="fas fa-download"></i> Export Analytics
+                    </button>
+                    <button class="btn btn-primary" onclick="generateReport()">
+                        <i class="fas fa-chart-bar"></i> Generate Report
+                    </button>
+                </div>
+            </div>
+            
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">User Growth Trends</div>
+                        <div class="chart-actions">
+                            <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 12px;">
+                                Monthly View
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-body">
+                        <div class="chart-container">
+                            <canvas id="growthChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div class="chart-title">Regional Performance</div>
+                    </div>
+                    <div class="chart-body">
+                        <div class="chart-container">
+                            <canvas id="regionalChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Average Session Duration</div>
+                        <div class="kpi-icon blue">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                    </div>
+                    <div class="kpi-value">4:32</div>
+                    <div class="kpi-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +15.2% vs last month
+                    </div>
+                </div>
+                
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Page Views per Session</div>
+                        <div class="kpi-icon green">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                    </div>
+                    <div class="kpi-value">3.8</div>
+                    <div class="kpi-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        +7.1% vs last month
+                    </div>
+                </div>
+                
+                <div class="kpi-card">
+                    <div class="kpi-header">
+                        <div class="kpi-title">Customer Acquisition Cost</div>
+                        <div class="kpi-icon orange">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                    </div>
+                    <div class="kpi-value">₹425</div>
+                    <div class="kpi-change negative">
+                        <i class="fas fa-arrow-up"></i>
+                        +3.4% vs last month
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Reports Section -->
+        <div id="reports-section" class="content-section">
+            <div class="page-header">
+                <h1 class="page-title">Reports & Analytics</h1>
+                <div class="page-actions">
+                    <button class="btn btn-secondary" onclick="scheduleReport()">
+                        <i class="fas fa-calendar"></i> Schedule Report
+                    </button>
+                    <button class="btn btn-primary" onclick="createCustomReport()">
+                        <i class="fas fa-plus"></i> Create Report
+                    </button>
+                </div>
+            </div>
+            
+            <div class="reports-grid">
+                <div class="report-card">
+                    <div class="report-preview">
+                        <div class="report-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                    <div class="report-content">
+                        <div class="report-title">Monthly Performance Report</div>
+                        <div class="report-description">Comprehensive analysis of user engagement, revenue, and growth metrics.</div>
+                        <div class="report-actions">
+                            <button class="btn btn-primary" onclick="viewReport('monthly')">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="btn btn-secondary" onclick="downloadReport('monthly')">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="report-card">
+                    <div class="report-preview" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                        <div class="report-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                    <div class="report-content">
+                        <div class="report-title">User Demographics Report</div>
+                        <div class="report-description">Detailed breakdown of user demographics, locations, and behavior patterns.</div>
+                        <div class="report-actions">
+                            <button class="btn btn-primary" onclick="viewReport('demographics')">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="btn btn-secondary" onclick="downloadReport('demographics')">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="report-card">
+                    <div class="report-preview" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <div class="report-icon">
+                            <i class="fas fa-rupee-sign"></i>
+                        </div>
+                    </div>
+                    <div class="report-content">
+                        <div class="report-title">Revenue Analysis Report</div>
+                        <div class="report-description">In-depth revenue analysis with forecasting and trend identification.</div>
+                        <div class="report-actions">
+                            <button class="btn btn-primary" onclick="viewReport('revenue')">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="btn btn-secondary" onclick="downloadReport('revenue')">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="report-card">
+                    <div class="report-preview" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <div class="report-icon">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                    </div>
+                    <div class="report-content">
+                        <div class="report-title">Marketing Campaign Report</div>
+                        <div class="report-description">Performance analysis of marketing campaigns and ROI calculations.</div>
+                        <div class="report-actions">
+                            <button class="btn btn-primary" onclick="viewReport('marketing')">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="btn btn-secondary" onclick="downloadReport('marketing')">
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- User Management Section -->
+        <div id="users-section" class="content-section">
+            <div class="page-header">
+                <h1 class="page-title">User Management</h1>
+                <div class="page-actions">
+                    <button class="btn btn-secondary" onclick="exportUsers()">
+                        <i class="fas fa-download"></i> Export Users
+                    </button>
+                    <button class="btn btn-primary" onclick="openAddUserModal()">
+                        <i class="fas fa-user-plus"></i> Add User
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-title">All Users</div>
+                    <div class="table-search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search users..." onkeyup="searchUserTable(this.value)">
+                    </div>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th onclick="sortUserTable(0)">Avatar <i class="fas fa-sort sort-arrow"></i></th>
+                            <th onclick="sortUserTable(1)">Name <i class="fas fa-sort sort-arrow"></i></th>
+                            <th onclick="sortUserTable(2)">Email <i class="fas fa-sort sort-arrow"></i></th>
+                            <th onclick="sortUserTable(3)">Role <i class="fas fa-sort sort-arrow"></i></th>
+                            <th onclick="sortUserTable(4)">Status <i class="fas fa-sort sort-arrow"></i></th>
+                            <th onclick="sortUserTable(5)">Last Active <i class="fas fa-sort sort-arrow"></i></th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody">
+                        <tr>
+                            <td>
+                                <div class="user-avatar" style="width: 32px; height: 32px; font-size: 12px;">AD</div>
+                            </td>
+                            <td>Arjun Desai</td>
+                            <td>arjun@example.com</td>
+                            <td>Admin</td>
+                            <td><span class="status-badge active">Active</span></td>
+                            <td>Just now</td>
+                            <td>
+                                <button class="btn btn-secondary" onclick="editUser('arjun')" style="padding: 4px 8px; font-size: 12px;">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger" onclick="deleteUser('arjun')" style="padding: 4px 8px; font-size: 12px; margin-left: 4px;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="user-avatar" style="width: 32px; height: 32px; font-size: 12px; background: #059669;">PS</div>
+                            </td>
+                            <td>Priya Sharma</td>
+                            <td>priya@example.com</td>
+                            <td>Editor</td>
+                            <td><span class="status-badge active">Active</span></td>
+                            <td>15 minutes ago</td>
+                            <td>
+                                <button class="btn btn-secondary" onclick="editUser('priya')" style="padding: 4px 8px; font-size: 12px;">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger" onclick="deleteUser('priya')" style="padding: 4px 8px; font-size: 12px; margin-left: 4px;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="user-avatar" style="width: 32px; height: 32px; font-size: 12px; background: #d97706;">RK</div>
+                            </td>
+                            <td>Rahul Kumar</td>
+                            <td>rahul@example.com</td>
+                            <td>Viewer</td>
+                            <td><span class="status-badge inactive">Inactive</span></td>
+                            <td>2 days ago</td>
+                            <td>
+                                <button class="btn btn-secondary" onclick="editUser('rahul')" style="padding: 4px 8px; font-size: 12px;">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger" onclick="deleteUser('rahul')" style="padding: 4px 8px; font-size: 12px; margin-left: 4px;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="user-avatar" style="width: 32px; height: 32px; font-size: 12px; background: #7c3aed;">SG</div>
+                            </td>
+                            <td>Sneha Gupta</td>
+                            <td>sneha@example.com</td>
+                            <td>Manager</td>
+                            <td><span class="status-badge active">Active</span></td>
+                            <td>1 hour ago</td>
+                            <td>
+                                <button class="btn btn-secondary" onclick="editUser('sneha')" style="padding: 4px 8px; font-size: 12px;">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger" onclick="deleteUser('sneha')" style="padding: 4px 8px; font-size: 12px; margin-left: 4px;">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Settings Section -->
+        <div id="settings-section" class="content-section">
+            <div class="page-header">
+                <h1 class="page-title">Settings & Configuration</h1>
+                <div class="page-actions">
+                    <button class="btn btn-secondary" onclick="exportSettings()">
+                        <i class="fas fa-download"></i> Export Settings
+                    </button>
+                    <button class="btn btn-primary" onclick="saveAllSettings()">
+                        <i class="fas fa-save"></i> Save All
+                    </button>
+                </div>
+            </div>
+            
+            <div class="settings-grid">
+                <div class="settings-card">
+                    <div class="settings-card-title">
+                        <i class="fas fa-chart-bar"></i>
+                        Dashboard Configuration
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Default Dashboard View</label>
+                        <select class="form-select" onchange="updateDashboardDefault(this.value)">
+                            <option value="overview">Overview</option>
+                            <option value="analytics">Analytics</option>
+                            <option value="reports">Reports</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Refresh Interval (seconds)</label>
+                        <input type="number" class="form-input" value="30" min="10" max="300" onchange="updateRefreshRate(this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" checked onchange="toggleAutoRefresh(this.checked)"> Auto-refresh data
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="settings-card">
+                    <div class="settings-card-title">
+                        <i class="fas fa-database"></i>
+                        Data Sources
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Primary Database</label>
+                        <select class="form-select">
+                            <option>MySQL - Production</option>
+                            <option>PostgreSQL - Analytics</option>
+                            <option>MongoDB - User Data</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">API Endpoint</label>
+                        <input type="text" class="form-input" value="https://api.example.com/v1">
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-secondary" onclick="testConnection()">
+                            <i class="fas fa-plug"></i> Test Connection
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="settings-card">
+                    <div class="settings-card-title">
+                        <i class="fas fa-bell"></i>
+                        Notifications
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" checked onchange="toggleNotifications('email', this.checked)"> Email notifications
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" checked onchange="toggleNotifications('push', this.checked)"> Push notifications
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" onchange="toggleNotifications('sms', this.checked)"> SMS notifications
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Notification Email</label>
+                        <input type="email" class="form-input" value="admin@company.com">
+                    </div>
+                </div>
+                
+                <div class="settings-card">
+                    <div class="settings-card-title">
+                        <i class="fas fa-shield-alt"></i>
+                        Security Settings
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" checked onchange="toggleSecurity('2fa', this.checked)"> Two-factor authentication
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Session timeout (minutes)</label>
+                        <input type="number" class="form-input" value="30" min="5" max="480">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" checked onchange="toggleSecurity('audit', this.checked)"> Enable audit logging
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-primary" onclick="generateApiKey()">
+                            <i class="fas fa-key"></i> Generate New API Key
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="settings-card">
+                    <div class="settings-card-title">
+                        <i class="fas fa-palette"></i>
+                        Appearance
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Theme</label>
+                        <select class="form-select" onchange="changeTheme(this.value)">
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                            <option value="auto">Auto</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Language</label>
+                        <select class="form-select" onchange="changeLanguage(this.value)">
+                            <option value="en">English</option>
+                            <option value="hi">हिन्दी (Hindi)</option>
+                            <option value="mr">मराठी (Marathi)</option>
+                            <option value="gu">ગુજરાતી (Gujarati)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Currency</label>
+                        <select class="form-select">
+                            <option value="INR">₹ Indian Rupee</option>
+                            <option value="USD">$ US Dollar</option>
+                            <option value="EUR">€ Euro</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="settings-card">
+                    <div class="settings-card-title">
+                        <i class="fas fa-download"></i>
+                        Export Settings
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Default Export Format</label>
+                        <select class="form-select">
+                            <option>Excel (.xlsx)</option>
+                            <option>CSV (.csv)</option>
+                            <option>PDF (.pdf)</option>
+                            <option>JSON (.json)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" checked> Include charts in exports
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Date format</label>
+                        <select class="form-select">
+                            <option>DD/MM/YYYY</option>
+                            <option>MM/DD/YYYY</option>
+                            <option>YYYY-MM-DD</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Modals -->
+    <!-- Add Widget Modal -->
+    <div class="modal-overlay" id="addWidgetModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Add New Widget</div>
+                <button class="modal-close" onclick="closeModal('addWidgetModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Widget Type</label>
+                    <select class="form-select" id="widgetType">
+                        <option value="kpi">KPI Card</option>
+                        <option value="chart">Chart</option>
+                        <option value="table">Data Table</option>
+                        <option value="metric">Custom Metric</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Widget Title</label>
+                    <input type="text" class="form-input" id="widgetTitle" placeholder="Enter widget title">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Data Source</label>
+                    <select class="form-select" id="widgetSource">
+                        <option value="users">User Data</option>
+                        <option value="revenue">Revenue Data</option>
+                        <option value="analytics">Analytics Data</option>
+                        <option value="custom">Custom Query</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Icon</label>
+                    <select class="form-select" id="widgetIcon">
+                        <option value="fa-chart-line">Chart Line</option>
+                        <option value="fa-users">Users</option>
+                        <option value="fa-rupee-sign">Rupee</option>
+                        <option value="fa-percentage">Percentage</option>
+                        <option value="fa-clock">Clock</option>
+                        <option value="fa-eye">Eye</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Color Theme</label>
+                    <select class="form-select" id="widgetColor">
+                        <option value="blue">Blue</option>
+                        <option value="green">Green</option>
+                        <option value="orange">Orange</option>
+                        <option value="red">Red</option>
+                        <option value="purple">Purple</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('addWidgetModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="addWidget()">Add Widget</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add User Modal -->
+    <div class="modal-overlay" id="addUserModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Add New User</div>
+                <button class="modal-close" onclick="closeModal('addUserModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" id="userName" placeholder="Enter full name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" class="form-input" id="userEmail" placeholder="Enter email address">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone Number</label>
+                    <input type="tel" class="form-input" id="userPhone" placeholder="Enter phone number">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Role</label>
+                    <select class="form-select" id="userRole">
+                        <option value="viewer">Viewer</option>
+                        <option value="editor">Editor</option>
+                        <option value="manager">Manager</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Department</label>
+                    <select class="form-select" id="userDepartment">
+                        <option value="marketing">Marketing</option>
+                        <option value="sales">Sales</option>
+                        <option value="analytics">Analytics</option>
+                        <option value="it">IT</option>
+                        <option value="hr">HR</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" id="sendWelcomeEmail" checked> Send welcome email
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('addUserModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="addUser()">Add User</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Profile Modal -->
+    <div class="modal-overlay" id="profileModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Profile Settings</div>
+                <button class="modal-close" onclick="closeModal('profileModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" value="Arjun Desai">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" value="arjun@company.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" class="form-input" value="+91 98765 43210">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Department</label>
+                    <input type="text" class="form-input" value="Analytics Team" readonly>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Bio</label>
+                    <textarea class="form-textarea" placeholder="Tell us about yourself...">Lead Analytics Manager with 5+ years experience in data-driven decision making and business intelligence.</textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('profileModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveProfile()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notifications -->
+    <div id="toast" class="toast"></div>
+    
+    
+    <script>
+        // Global Variables
+        let currentSection = 'overview';
+        let trafficChart = null;
+        let sourceChart = null;
+        let growthChart = null;
+        let regionalChart = null;
+        let isNotificationOpen = false;
+        let isUserMenuOpen = false;
+        let searchTimeout = null;
+        
+        // Initialize Dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            startRealTimeUpdates();
+            updateNotificationBadge();
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('.notification-btn') && !event.target.closest('.notification-panel')) {
+                    document.getElementById('notificationPanel').style.display = 'none';
+                    isNotificationOpen = false;
+                }
+                if (!event.target.closest('.user-profile') && !event.target.closest('#userDropdown')) {
+                    document.getElementById('userDropdown').classList.remove('show');
+                    isUserMenuOpen = false;
+                }
+            });
+        });
+        
+        // Show notification toast
+        function showNotification(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Navigation Functions
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            
+            sidebar.classList.toggle('open');
+            mainContent.classList.toggle('expanded');
+        }
+        
+        function showSection(sectionName) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            const targetSection = document.getElementById(sectionName + '-section');
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+            
+            // Update navigation active state
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Find and activate the clicked nav item
+            const activeItem = Array.from(navItems).find(item => 
+                item.onclick && item.onclick.toString().includes(sectionName)
+            );
+            if (activeItem) {
+                activeItem.classList.add('active');
+            }
+            
+            currentSection = sectionName;
+            
+            // Initialize section-specific charts
+            if (sectionName === 'analytics') {
+                setTimeout(() => {
+                    initializeAnalyticsCharts();
+                }, 100);
+            }
+        }
+        
+        // Header Functions
+        function toggleNotifications() {
+            const panel = document.getElementById('notificationPanel');
+            const isVisible = panel.style.display === 'block';
+            
+            panel.style.display = isVisible ? 'none' : 'block';
+            isNotificationOpen = !isVisible;
+            
+            if (!isVisible) {
+                // Mark notifications as read when opened
+                setTimeout(() => {
+                    const unreadItems = panel.querySelectorAll('.notification-item.unread');
+                    unreadItems.forEach(item => {
+                        item.classList.remove('unread');
+                    });
+                    updateNotificationBadge();
+                }, 1000);
+            }
+        }
+        
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+            isUserMenuOpen = !isUserMenuOpen;
+        }
+        
+        function updateNotificationBadge() {
+            const badge = document.getElementById('notificationBadge');
+            const unreadCount = document.querySelectorAll('.notification-item.unread').length;
+            
+            if (unreadCount > 0) {
+                badge.style.display = 'block';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+        
+        function markAllAsRead() {
+            const unreadItems = document.querySelectorAll('.notification-item.unread');
+            unreadItems.forEach(item => {
+                item.classList.remove('unread');
+            });
+            updateNotificationBadge();
+            showNotification('All notifications marked as read', 'success');
+        }
+        
+        // User Profile Functions
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                showNotification('Logging out...', 'info');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            }
+        }
+        
+        function toggleDarkMode() {
+            showNotification('Dark mode toggle - Feature coming soon!', 'info');
+        }
+        
+        function showHelp() {
+            alert('Help & Support\n\nFor technical support:\n• Email: support@analyticsprodindia.com\n• Phone: +91 1234 567 890\n• Documentation: Available in settings\n• Live Chat: Available during business hours');
+        }
+        
+        // Search Functions
+        function performSearch(query) {
+            const searchResults = document.getElementById('searchResults');
+            
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+            }
+            
+            if (query.length < 2) {
+                searchResults.style.display = 'none';
+                return;
+            }
+            
+            searchTimeout = setTimeout(() => {
+                // Simulate search results
+                const mockResults = [
+                    { type: 'user', name: 'Priya Sharma', description: 'Active user from Mumbai' },
+                    { type: 'report', name: 'Monthly Revenue Report', description: 'Financial analysis report' },
+                    { type: 'metric', name: 'Conversion Rate', description: 'Current: 3.42%' },
+                    { type: 'user', name: 'Rajesh Kumar', description: 'Admin user from Delhi' },
+                    { type: 'report', name: 'User Demographics Report', description: 'User behavior analysis' },
+                    { type: 'metric', name: 'Total Users', description: 'Current: 2,45,670' }
+                ];
+                
+                const filteredResults = mockResults.filter(item =>
+                    item.name.toLowerCase().includes(query.toLowerCase()) ||
+                    item.description.toLowerCase().includes(query.toLowerCase())
+                );
+                
+                if (filteredResults.length > 0) {
+                    searchResults.innerHTML = filteredResults.slice(0, 5).map(result => `
+                        <div class="search-result-item" onclick="selectSearchResult('${result.type}', '${result.name}')">
+                            <i class="fas fa-${result.type === 'user' ? 'user' : result.type === 'report' ? 'file-alt' : 'chart-bar'}"></i>
+                            <div>
+                                <div style="font-weight: 500;">${result.name}</div>
+                                <div style="font-size: 12px; color: #64748b;">${result.description}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                    searchResults.style.display = 'block';
+                } else {
+                    searchResults.innerHTML = '<div class="search-result-item">No results found</div>';
+                    searchResults.style.display = 'block';
+                }
+            }, 300);
+        }
+        
+        function selectSearchResult(type, name) {
+            const searchInput = document.querySelector('.search-input');
+            searchInput.value = name;
+            document.getElementById('searchResults').style.display = 'none';
+            
+            // Navigate based on result type
+            if (type === 'user') {
+                showSection('users');
+            } else if (type === 'report') {
+                showSection('reports');
+            } else if (type === 'metric') {
+                showSection('overview');
+            }
+            
+            showNotification(`Navigated to ${type}: ${name}`, 'success');
+        }
+        
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+        
+        function openAddWidgetModal() {
+            openModal('addWidgetModal');
+        }
+        
+        function openAddUserModal() {
+            openModal('addUserModal');
+        }
+        
+        function openProfileModal() {
+            closeModal('userDropdown');
+            document.getElementById('userDropdown').classList.remove('show');
+            openModal('profileModal');
+        }
+        
+        function openPreferencesModal() {
+            showNotification('Preferences: Dashboard layout, notifications, refresh intervals, display options', 'info');
+        }
+        
+        function saveProfile() {
+            showNotification('Profile updated successfully!', 'success');
+            closeModal('profileModal');
+        }
+        
+        // Widget Management
+        function addWidget() {
+            const type = document.getElementById('widgetType').value;
+            const title = document.getElementById('widgetTitle').value;
+            const source = document.getElementById('widgetSource').value;
+            const icon = document.getElementById('widgetIcon').value;
+            const color = document.getElementById('widgetColor').value;
+            
+            if (!title) {
+                showNotification('Please enter a widget title', 'error');
+                return;
+            }
+            
+            const kpiGrid = document.getElementById('kpiGrid');
+            const widgetId = 'widget-' + Date.now();
+            
+            // Generate random value based on source
+            let value, change, changeClass;
+            switch (source) {
+                case 'users':
+                    value = (Math.floor(Math.random() * 100000) + 10000).toLocaleString();
+                    break;
+                case 'revenue':
+                    value = '₹' + (Math.floor(Math.random() * 1000000) + 100000).toLocaleString();
+                    break;
+                case 'analytics':
+                    value = (Math.random() * 100).toFixed(1) + '%';
+                    break;
+                default:
+                    value = (Math.random() * 1000).toFixed(0);
+            }
+            
+            change = (Math.random() * 20 - 10).toFixed(1);
+            changeClass = change >= 0 ? 'positive' : 'negative';
+            const arrow = change >= 0 ? 'fa-arrow-up' : 'fa-arrow-down';
+            
+            const widgetHTML = `
+                <div class="kpi-card" data-widget="${widgetId}">
+                    <button class="delete-widget" onclick="deleteWidget('${widgetId}')">×</button>
+                    <div class="kpi-header">
+                        <div class="kpi-title">${title}</div>
+                        <div class="kpi-icon ${color}">
+                            <i class="fas ${icon}"></i>
+                        </div>
+                    </div>
+                    <div class="kpi-value">${value}</div>
+                    <div class="kpi-change ${changeClass}">
+                        <i class="fas ${arrow}"></i>
+                        ${Math.abs(change)}% vs last month
+                    </div>
+                </div>
+            `;
+            
+            kpiGrid.insertAdjacentHTML('beforeend', widgetHTML);
+            closeModal('addWidgetModal');
+            
+            // Clear form
+            document.getElementById('widgetTitle').value = '';
+            
+            showNotification('Widget added successfully!', 'success');
+        }
+        
+        function deleteWidget(widgetId) {
+            if (confirm('Are you sure you want to delete this widget?')) {
+                const widget = document.querySelector(`[data-widget="${widgetId}"]`);
+                if (widget) {
+                    widget.remove();
+                    showNotification('Widget deleted successfully!', 'success');
+                }
+            }
+        }
+        
+        // User Management Functions
+        function addUser() {
+            const name = document.getElementById('userName').value;
+            const email = document.getElementById('userEmail').value;
+            const phone = document.getElementById('userPhone').value;
+            const role = document.getElementById('userRole').value;
+            const department = document.getElementById('userDepartment').value;
+            const sendEmail = document.getElementById('sendWelcomeEmail').checked;
+            
+            if (!name || !email) {
+                showNotification('Please enter name and email address', 'error');
+                return;
+            }
+            
+            const userTableBody = document.getElementById('userTableBody');
+            const userId = 'user-' + Date.now();
+            const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
+            const colors = ['#2563eb', '#059669', '#d97706', '#7c3aed', '#dc2626'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            const userHTML = `
+                <tr data-user="${userId}">
+                    <td>
+                        <div class="user-avatar" style="width: 32px; height: 32px; font-size: 12px; background: ${randomColor};">${initials}</div>
+                    </td>
+                    <td>${name}</td>
+                    <td>${email}</td>
+                    <td>${role.charAt(0).toUpperCase() + role.slice(1)}</td>
+                    <td><span class="status-badge active">Active</span></td>
+                    <td>Just now</td>
+                    <td>
+                        <button class="btn btn-secondary" onclick="editUser('${userId}')" style="padding: 4px 8px; font-size: 12px;">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteUser('${userId}')" style="padding: 4px 8px; font-size: 12px; margin-left: 4px;">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+            
+            userTableBody.insertAdjacentHTML('afterbegin', userHTML);
+            closeModal('addUserModal');
+            
+            // Clear form
+            document.getElementById('userName').value = '';
+            document.getElementById('userEmail').value = '';
+            document.getElementById('userPhone').value = '';
+            
+            let message = `User "${name}" added successfully!`;
+            if (sendEmail) {
+                message += ' Welcome email sent.';
+            }
+            showNotification(message, 'success');
+        }
+        
+        function editUser(userId) {
+            showNotification(`Edit user: ${userId} - Feature includes: Edit details, Change roles, Update contact info, Manage status`, 'info');
+        }
+        
+        function deleteUser(userId) {
+            if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+                const userRow = document.querySelector(`[data-user="${userId}"]`);
+                if (userRow) {
+                    userRow.remove();
+                    showNotification('User deleted successfully!', 'success');
+                }
+            }
+        }
+        
+        function exportUsers() {
+            // Simulate export functionality
+            const userRows = document.querySelectorAll('#userTableBody tr');
+            let csvContent = 'Name,Email,Role,Status,Last Active\n';
+            
+            userRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const name = cells[1].textContent;
+                const email = cells[2].textContent;
+                const role = cells[3].textContent;
+                const status = cells[4].textContent.trim();
+                const lastActive = cells[5].textContent;
+                
+                csvContent += `"${name}","${email}","${role}","${status}","${lastActive}"\n`;
+            });
+            
+            // Create download
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'users-export-' + new Date().toISOString().slice(0, 10) + '.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            showNotification('Users exported successfully!', 'success');
+        }
+        
+        // Chart Functions
+        function initializeCharts() {
+            // Traffic Chart
+            const trafficCtx = document.getElementById('trafficChart').getContext('2d');
+            trafficChart = new Chart(trafficCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                    datasets: [{
+                        label: 'Page Views',
+                        data: [120000, 190000, 150000, 250000, 220000, 300000, 280000],
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: 'Unique Visitors',
+                        data: [80000, 120000, 100000, 180000, 160000, 220000, 200000],
+                        borderColor: '#059669',
+                        backgroundColor: 'rgba(5, 150, 105, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0,0,0,0.05)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Source Chart (Doughnut)
+            const sourceCtx = document.getElementById('sourceChart').getContext('2d');
+            sourceChart = new Chart(sourceCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Direct', 'Search', 'Social', 'Email', 'Referral'],
+                    datasets: [{
+                        data: [35, 25, 20, 12, 8],
+                        backgroundColor: [
+                            '#2563eb',
+                            '#059669',
+                            '#d97706',
+                            '#dc2626',
+                            '#7c3aed'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 15
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        }
+        
+        function initializeAnalyticsCharts() {
+            // Growth Chart
+            const growthCtx = document.getElementById('growthChart');
+            if (growthCtx && !growthChart) {
+                growthChart = new Chart(growthCtx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ['Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024'],
+                        datasets: [{
+                            label: 'New Users',
+                            data: [12500, 18700, 16200, 21800],
+                            backgroundColor: '#2563eb',
+                            borderRadius: 4
+                        }, {
+                            label: 'Returning Users',
+                            data: [8300, 12400, 14600, 16900],
+                            backgroundColor: '#059669',
+                            borderRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value.toLocaleString();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            
+            // Regional Chart
+            const regionalCtx = document.getElementById('regionalChart');
+            if (regionalCtx && !regionalChart) {
+                regionalChart = new Chart(regionalCtx.getContext('2d'), {
+                    type: 'pie',
+                    data: {
+                        labels: ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Others'],
+                        datasets: [{
+                            data: [28, 22, 18, 12, 10, 10],
+                            backgroundColor: [
+                                '#2563eb',
+                                '#059669',
+                                '#d97706',
+                                '#dc2626',
+                                '#7c3aed',
+                                '#64748b'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+        }
+        
+        function updateTrafficChart(days) {
+            let newData, newLabels;
+            
+            if (days == 7) {
+                newLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                newData = [
+                    [15000, 18000, 22000, 19000, 25000, 28000, 24000],
+                    [12000, 14000, 17000, 15000, 20000, 22000, 18000]
+                ];
+            } else if (days == 90) {
+                newLabels = ['Jan', 'Feb', 'Mar'];
+                newData = [
+                    [450000, 520000, 480000],
+                    [320000, 380000, 350000]
+                ];
+            } else {
+                newLabels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                newData = [
+                    [65000, 78000, 72000, 85000],
+                    [48000, 58000, 55000, 65000]
+                ];
+            }
+            
+            trafficChart.data.labels = newLabels;
+            trafficChart.data.datasets[0].data = newData[0];
+            trafficChart.data.datasets[1].data = newData[1];
+            trafficChart.update();
+            
+            showNotification(`Chart updated to show last ${days} days`, 'success');
+        }
+        
+        function refreshSourceChart() {
+            const newData = [
+                Math.floor(Math.random() * 15) + 30,
+                Math.floor(Math.random() * 10) + 20,
+                Math.floor(Math.random() * 10) + 15,
+                Math.floor(Math.random() * 8) + 8,
+                Math.floor(Math.random() * 5) + 5
+            ];
+            
+            sourceChart.data.datasets[0].data = newData;
+            sourceChart.update();
+            
+            showNotification('Source chart data refreshed!', 'success');
+        }
+        
+        // Export Functions
+        function exportDashboard() {
+            showNotification('Exporting dashboard data...', 'info');
+            setTimeout(() => {
+                const data = {
+                    date: new Date().toISOString(),
+                    kpis: {
+                        totalUsers: document.getElementById('totalUsers').textContent,
+                        revenue: document.getElementById('revenue').textContent,
+                        conversionRate: document.getElementById('conversionRate').textContent,
+                        bounceRate: document.getElementById('bounceRate').textContent
+                    }
+                };
+                
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'dashboard-export-' + new Date().toISOString().slice(0, 10) + '.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                showNotification('Dashboard exported successfully!', 'success');
+            }, 2000);
+        }
+        
+        function exportAnalytics() {
+            showNotification('Analytics report exported to your downloads folder!', 'success');
+        }
+        
+        function exportData() {
+            showNotification('Data export started. You will receive an email when ready.', 'info');
+        }
+        
+        function openImportModal() {
+            showNotification('Import feature: Upload CSV, Excel, or JSON files to import user data, analytics, or configurations', 'info');
+        }
+        
+        // Report Functions
+        function generateReport() {
+            showNotification('Generating comprehensive analytics report...', 'info');
+            setTimeout(() => {
+                showNotification('Report generated and saved to Reports section!', 'success');
+            }, 3000);
+        }
+        
+        function viewReport(reportType) {
+            const reportTitles = {
+                'monthly': 'Monthly Performance Report',
+                'demographics': 'User Demographics Report',
+                'revenue': 'Revenue Analysis Report',
+                'marketing': 'Marketing Campaign Report'
+            };
+            
+            showNotification(`Opening ${reportTitles[reportType]}...`, 'info');
+            setTimeout(() => {
+                alert(`${reportTitles[reportType]}\n\nReport Details:\n• Interactive charts and graphs\n• Detailed data tables\n• Trend analysis\n• Recommendations\n• Export options available\n\n[This would open the full report view]`);
+            }, 1000);
+        }
+        
+        function downloadReport(reportType) {
+            const reportTitles = {
+                'monthly': 'Monthly Performance Report',
+                'demographics': 'User Demographics Report',  
+                'revenue': 'Revenue Analysis Report',
+                'marketing': 'Marketing Campaign Report'
+            };
+            
+            showNotification(`Downloading ${reportTitles[reportType]}...`, 'info');
+            setTimeout(() => {
+                showNotification(`${reportTitles[reportType]} downloaded successfully!`, 'success');
+            }, 2000);
+        }
+        
+        function scheduleReport() {
+            showNotification('Report scheduling: Set up automatic generation and delivery of reports via email or dashboard', 'info');
+        }
+        
+        function createCustomReport() {
+            showNotification('Custom report builder: Select data sources, metrics, date ranges, and visualization types', 'info');
+        }
+        
+        // Real-time Updates
+        function startRealTimeUpdates() {
+            setInterval(() => {
+                updateKPIValues();
+                addNewActivity();
+                // Add new notification occasionally
+                if (Math.random() < 0.1) {
+                    addNewNotification();
+                }
+            }, 5000);
+        }
+        
+        function updateKPIValues() {
+            const elements = [
+                { id: 'totalUsers', prefix: '', suffix: '', change: 50 },
+                { id: 'revenue', prefix: '₹', suffix: '', change: 5000 },
+                { id: 'conversionRate', prefix: '', suffix: '%', change: 0.1 },
+                { id: 'bounceRate', prefix: '', suffix: '%', change: 0.5 }
+            ];
+            
+            elements.forEach(element => {
+                const el = document.getElementById(element.id);
+                if (el) {
+                    let currentValue = parseFloat(el.textContent.replace(/[^\d.-]/g, ''));
+                    let change = (Math.random() * element.change * 2) - element.change;
+                    let newValue = Math.max(0, currentValue + change);
+                    
+                    if (element.id === 'totalUsers') {
+                        el.textContent = Math.floor(newValue).toLocaleString();
+                    } else if (element.id === 'revenue') {
+                        el.textContent = element.prefix + Math.floor(newValue).toLocaleString();
+                    } else {
+                        el.textContent = element.prefix + newValue.toFixed(2) + element.suffix;
+                    }
+                }
+            });
+        }
+        
+        function addNewActivity() {
+            const tableBody = document.getElementById('activityTableBody');
+            if (!tableBody) return;
+            
+            const users = ['Rajesh Kumar', 'Priya Sharma', 'Vikram Singh', 'Anita Patel', 'Suresh Gupta', 'Kavita Rao', 'Amit Joshi', 'Neha Aggarwal', 'Ravi Patel', 'Sunita Devi'];
+            const actions = ['Purchase', 'Sign Up', 'Login', 'Download', 'Update Profile', 'Subscribe', 'View Product', 'Add to Cart'];
+            const statuses = [
+                { name: 'Completed', class: 'active' },
+                { name: 'Active', class: 'active' },
+                { name: 'Failed', class: 'inactive' },
+                { name: 'Pending', class: 'pending' }
+            ];
+            
+            const newRow = document.createElement('tr');
+            const randomUser = users[Math.floor(Math.random() * users.length)];
+            const randomAction = actions[Math.floor(Math.random() * actions.length)];
+            const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+            const now = new Date();
+            
+            newRow.innerHTML = `
+                <td>${randomUser}</td>
+                <td>${randomAction}</td>
+                <td>${now.toISOString().slice(0, 16).replace('T', ' ')}</td>
+                <td><span class="status-badge ${randomStatus.class}">${randomStatus.name}</span></td>
+                <td>${randomAction === 'Purchase' ? '₹' + (Math.random() * 50000 + 5000).toFixed(0) : '-'}</td>
+            `;
+            
+            tableBody.insertBefore(newRow, tableBody.firstChild);
+            
+            // Keep only last 20 rows
+            while (tableBody.children.length > 20) {
+                tableBody.removeChild(tableBody.lastChild);
+            }
+        }
+        
+        function addNewNotification() {
+            const notificationList = document.getElementById('notificationList');
+            const notifications = [
+                { icon: 'user-plus', iconClass: 'success', title: 'New user registered', description: 'Rahul Sharma joined the platform' },
+                { icon: 'chart-line', iconClass: 'info', title: 'Traffic spike detected', description: '25% increase in page views' },
+                { icon: 'rupee-sign', iconClass: 'success', title: 'Payment received', description: '₹25,000 payment processed' },
+                { icon: 'exclamation-triangle', iconClass: 'warning', title: 'Low conversion rate', description: 'Conversion dropped below 3%' },
+                { icon: 'bell', iconClass: 'info', title: 'System maintenance', description: 'Scheduled maintenance in 2 hours' },
+                { icon: 'download', iconClass: 'success', title: 'Report generated', description: 'Monthly report is ready for download' }
+            ];
+            
+            const randomNotification = notifications[Math.floor(Math.random() * notifications.length)];
+            
+            const notificationHTML = `
+                <div class="notification-item unread">
+                    <div class="notification-icon ${randomNotification.iconClass}">
+                        <i class="fas fa-${randomNotification.icon}"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight: 500;">${randomNotification.title}</div>
+                        <div style="font-size: 12px; color: #64748b;">${randomNotification.description}</div>
+                        <div style="font-size: 12px; color: #9ca3af;">Just now</div>
+                    </div>
+                </div>
+            `;
+            
+            notificationList.insertAdjacentHTML('afterbegin', notificationHTML);
+            updateNotificationBadge();
+            
+            // Keep only last 10 notifications
+            const notification_items = notificationList.querySelectorAll('.notification-item');
+            if (notification_items.length > 10) {
+                notification_items[notification_items.length - 1].remove();
+            }
+        }
+        
+        // Table Functions
+        function searchTable(searchTerm) {
+            const tableBody = document.getElementById('activityTableBody');
+            if (!tableBody) return;
+            
+            const rows = tableBody.getElementsByTagName('tr');
+            
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const cells = row.getElementsByTagName('td');
+                let found = false;
+                
+                for (let j = 0; j < cells.length; j++) {
+                    if (cells[j].textContent.toLowerCase().includes(searchTerm.toLowerCase())) {
+                        found = true;
+                        break;
+                    }
+                }
+                
+                row.style.display = found ? '' : 'none';
+            }
+        }
+        
+        function searchUserTable(searchTerm) {
+            const tableBody = document.getElementById('userTableBody');
+            if (!tableBody) return;
+            
+            const rows = tableBody.getElementsByTagName('tr');
+            
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                const cells = row.getElementsByTagName('td');
+                let found = false;
+                
+                for (let j = 1; j < cells.length - 1; j++) {
+                    if (cells[j].textContent.toLowerCase().includes(searchTerm.toLowerCase())) {
+                        found = true;
+                        break;
+                    }
+                }
+                
+                row.style.display = found ? '' : 'none';
+            }
+        }
+                function sortTable(columnIndex) {
+            const table = document.querySelector('#activityTableBody').closest('table');
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            rows.sort((a, b) => {
+                const aVal = a.cells[columnIndex].textContent.trim();
+                const bVal = b.cells[columnIndex].textContent.trim();
+                
+                if (columnIndex === 2) {
+                    return new Date(bVal) - new Date(aVal);
+                }
+                
+                if (columnIndex === 4) {
+                    const aNum = parseFloat(aVal.replace(/[^\d.-]/g, '')) || 0;
+                    const bNum = parseFloat(bVal.replace(/[^\d.-]/g, '')) || 0;
+                    return bNum - aNum;
+                }
+                
+                return aVal.localeCompare(bVal);
+            });
+            
+            rows.forEach(row => tbody.appendChild(row));
+            showNotification('Table sorted successfully!', 'success');
+        }
+        
+        function sortUserTable(columnIndex) {
+            const table = document.querySelector('#userTableBody').closest('table');
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            rows.sort((a, b) => {
+                if (columnIndex === 0) return 0;
+                
+                const aVal = a.cells[columnIndex].textContent.trim();
+                const bVal = b.cells[columnIndex].textContent.trim();
+                
+                return aVal.localeCompare(bVal);
+            });
+            
+            rows.forEach(row => tbody.appendChild(row));
+            showNotification('User table sorted successfully!', 'success');
+        }
+        
+        // Settings Functions
+        function updateDashboardDefault(value) {
+            localStorage.setItem('defaultDashboard', value);
+            showNotification(`Default dashboard set to ${value}`, 'success');
+        }
+        
+        function updateRefreshRate(seconds) {
+            localStorage.setItem('refreshRate', seconds);
+            showNotification(`Refresh rate updated to ${seconds} seconds`, 'success');
+        }
+        
+        function toggleAutoRefresh(enabled) {
+            localStorage.setItem('autoRefresh', enabled);
+            showNotification(`Auto-refresh ${enabled ? 'enabled' : 'disabled'}`, 'success');
+        }
+        
+        function testConnection() {
+            showNotification('Testing connection...', 'info');
+            setTimeout(() => {
+                const success = Math.random() > 0.2;
+                if (success) {
+                    showNotification('Connection successful! Database connected.', 'success');
+                } else {
+                    showNotification('Connection failed. Please check settings.', 'error');
+                }
+            }, 2000);
+        }
+        
+        function toggleNotifications(type, enabled) {
+            localStorage.setItem(`notifications_${type}`, enabled);
+            showNotification(`${type.charAt(0).toUpperCase() + type.slice(1)} notifications ${enabled ? 'enabled' : 'disabled'}`, 'success');
+        }
+        
+        function toggleSecurity(type, enabled) {
+            localStorage.setItem(`security_${type}`, enabled);
+            let message = '';
+            if (type === '2fa') message = `Two-factor authentication ${enabled ? 'enabled' : 'disabled'}`;
+            if (type === 'audit') message = `Audit logging ${enabled ? 'enabled' : 'disabled'}`;
+            showNotification(message, 'success');
+        }
+        
+        function generateApiKey() {
+            const apiKey = 'ak_' + Math.random().toString(36).substr(2, 32);
+            navigator.clipboard.writeText(apiKey).then(() => {
+                showNotification(`New API key generated and copied: ${apiKey.substring(0, 10)}...`, 'success');
+            });
+        }
+        
+        function changeTheme(theme) {
+            localStorage.setItem('theme', theme);
+            showNotification(`Theme changed to ${theme} mode`, 'success');
+        }
+        
+        function changeLanguage(lang) {
+            localStorage.setItem('language', lang);
+            const languages = {
+                'en': 'English',
+                'hi': 'हिन्दी (Hindi)',
+                'mr': 'मराठी (Marathi)',
+                'gu': 'ગુજરાતી (Gujarati)'
+            };
+            showNotification(`Language changed to ${languages[lang]}`, 'success');
+        }
+        
+        function saveAllSettings() {
+            showNotification('Saving all settings...', 'info');
+            setTimeout(() => {
+                showNotification('All settings saved successfully!', 'success');
+            }, 1500);
+        }
+        
+        function exportSettings() {
+            const settings = {
+                dashboard: localStorage.getItem('defaultDashboard') || 'overview',
+                refreshRate: localStorage.getItem('refreshRate') || '30',
+                autoRefresh: localStorage.getItem('autoRefresh') || 'true',
+                theme: localStorage.getItem('theme') || 'light',
+                language: localStorage.getItem('language') || 'en'
+            };
+            
+            const blob = new Blob([JSON.stringify(settings, null, 2)], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'analytics-dashboard-settings.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            showNotification('Settings exported successfully!', 'success');
+        }
+        
+        // Window resize handler
+        window.addEventListener('resize', function() {
+            if (trafficChart) trafficChart.resize();
+            if (sourceChart) sourceChart.resize();
+            if (growthChart) growthChart.resize();
+            if (regionalChart) regionalChart.resize();
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey || event.metaKey) {
+                switch(event.key) {
+                    case 's':
+                        event.preventDefault();
+                        saveAllSettings();
+                        break;
+                    case 'e':
+                        event.preventDefault();
+                        exportDashboard();
+                        break;
+                    case '/':
+                        event.preventDefault();
+                        document.querySelector('.search-input').focus();
+                        break;
+                }
+            }
+        });
+    </script>
+    
+</body>
+</html>
+
+        
 
