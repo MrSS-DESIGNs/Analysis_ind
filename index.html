@@ -14,6 +14,11 @@
             box-sizing: border-box;
         }
         
+        html, body {
+            min-height: 100%;
+            overflow-x: hidden;
+        }
+        
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: #f8fafc;
@@ -221,6 +226,9 @@
             padding: 16px;
             border-bottom: 1px solid #e2e8f0;
             font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         
         .notification-list {
@@ -264,19 +272,20 @@
             color: #d97706;
         }
         
-        /* Sidebar Styles */
+        /* FIXED SIDEBAR STYLES */
         .sidebar {
             position: fixed;
             left: 0;
             top: 64px;
-            bottom: 0;
             width: 240px;
             background: #f8fafc;
             border-right: 1px solid #e2e8f0;
-            padding: 24px 0;
+            padding: 24px 0 100px 0;
             overflow-y: auto;
             z-index: 900;
             transition: transform 0.3s ease;
+            height: calc(100vh - 64px - 400px);
+            max-height: calc(100vh - 64px - 400px);
         }
         
         .sidebar.collapsed {
@@ -324,17 +333,21 @@
             margin-right: 12px;
         }
         
-        /* Main Content */
+        /* FIXED MAIN CONTENT */
         .main-content {
             margin-left: 240px;
             margin-top: 64px;
             padding: 24px;
-            min-height: calc(100vh - 64px);
+            min-height: calc(100vh - 64px - 450px);
             transition: margin-left 0.3s ease;
+            margin-bottom: 450px;
+            position: relative;
+            z-index: 1;
         }
         
         .main-content.expanded {
             margin-left: 0;
+            margin-bottom: 450px;
         }
         
         .page-header {
@@ -852,7 +865,7 @@
             gap: 8px;
         }
         
-        /* Success/Error Messages */
+        /* Toast Messages */
         .toast {
             position: fixed;
             top: 80px;
@@ -920,14 +933,20 @@
             
             .sidebar {
                 transform: translateX(-240px);
+                height: calc(100vh - 64px);
+                padding: 24px 0;
             }
             
             .sidebar.open {
                 transform: translateX(0);
+                z-index: 1100;
+                box-shadow: 4px 0 12px rgba(0,0,0,0.15);
             }
             
             .main-content {
                 margin-left: 0;
+                margin-bottom: 450px;
+                padding: 16px;
             }
             
             .kpi-grid {
@@ -1006,7 +1025,7 @@
         <div class="notification-panel" id="notificationPanel">
             <div class="notification-header">
                 <span>Notifications</span>
-                <button onclick="markAllAsRead()" style="background: none; border: none; color: #2563eb; cursor: pointer;">Mark all as read</button>
+                <button onclick="markAllAsRead()" style="background: none; border: none; color: #2563eb; cursor: pointer; font-size: 12px;">Mark all as read</button>
             </div>
             <div class="notification-list" id="notificationList">
                 <div class="notification-item unread">
@@ -1761,9 +1780,351 @@
             </div>
         </div>
     </main>
+
+    <!-- FOOTER SECTION -->
+    <footer style="
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        color: white;
+        padding: 40px 0 20px 0;
+        margin-top: 60px;
+        border-top: 4px solid #2563eb;
+        position: relative;
+        overflow: hidden;
+        clear: both;
+        z-index: 800;
+    ">
+        <div style="
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: radial-gradient(circle at 25% 25%, rgba(37, 99, 235, 0.1) 0%, transparent 50%),
+                              radial-gradient(circle at 75% 75%, rgba(5, 150, 105, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        "></div>
+
+        <div style="
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        ">
+            <div style="
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 40px;
+                margin-bottom: 40px;
+            " id="footerGrid">
+                
+                <!-- Company Info -->
+                <div>
+                    <div style="
+                        display: flex;
+                        align-items: center;
+                        margin-bottom: 20px;
+                    ">
+                        <div style="
+                            width: 48px;
+                            height: 48px;
+                            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+                            border-radius: 12px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin-right: 12px;
+                            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+                        ">
+                            <i class="fas fa-code" style="color: white; font-size: 20px;"></i>
+                        </div>
+                        <div>
+                            <h3 style="
+                                margin: 0;
+                                font-size: 22px;
+                                font-weight: 700;
+                                background: linear-gradient(135deg, #fff, #e2e8f0);
+                                -webkit-background-clip: text;
+                                -webkit-text-fill-color: transparent;
+                                background-clip: text;
+                            ">SS Webcraft Studio</h3>
+                            <p style="
+                                margin: 4px 0 0 0;
+                                font-size: 12px;
+                                color: #94a3b8;
+                                font-weight: 500;
+                            ">Crafting Digital Excellence</p>
+                        </div>
+                    </div>
+                    
+                    <p style="
+                        margin: 0 0 20px 0;
+                        color: #cbd5e1;
+                        line-height: 1.6;
+                        font-size: 14px;
+                    ">
+                        Professional web development and design solutions. Creating modern, responsive, and high-performance digital experiences for businesses across India.
+                    </p>
+                    
+                    <div style="display: flex; gap: 12px;">
+                        <a href="#" onclick="footerShowContact()" style="
+                            width: 36px;
+                            height: 36px;
+                            background: rgba(37, 99, 235, 0.2);
+                            border: 1px solid rgba(37, 99, 235, 0.3);
+                            border-radius: 8px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: #60a5fa;
+                            text-decoration: none;
+                            transition: all 0.3s ease;
+                        " onmouseover="this.style.background='rgba(37, 99, 235, 0.3)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(37, 99, 235, 0.2)'; this.style.transform='translateY(0)'">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="#" onclick="footerShowContact()" style="
+                            width: 36px;
+                            height: 36px;
+                            background: rgba(5, 150, 105, 0.2);
+                            border: 1px solid rgba(5, 150, 105, 0.3);
+                            border-radius: 8px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: #34d399;
+                            text-decoration: none;
+                            transition: all 0.3s ease;
+                        " onmouseover="this.style.background='rgba(5, 150, 105, 0.3)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(5, 150, 105, 0.2)'; this.style.transform='translateY(0)'">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        <a href="#" onclick="footerShowContact()" style="
+                            width: 36px;
+                            height: 36px;
+                            background: rgba(217, 119, 6, 0.2);
+                            border: 1px solid rgba(217, 119, 6, 0.3);
+                            border-radius: 8px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: #fb923c;
+                            text-decoration: none;
+                            transition: all 0.3s ease;
+                        " onmouseover="this.style.background='rgba(217, 119, 6, 0.3)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(217, 119, 6, 0.2)'; this.style.transform='translateY(0)'">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Services -->
+                <div>
+                    <h4 style="
+                        margin: 0 0 20px 0;
+                        font-size: 16px;
+                        font-weight: 600;
+                        color: #f1f5f9;
+                    ">Our Services</h4>
+                    <ul style="
+                        margin: 0;
+                        padding: 0;
+                        list-style: none;
+                    ">
+                        <li style="margin-bottom: 12px;">
+                            <a href="#" onclick="footerShowService('web-design')" style="
+                                color: #cbd5e1;
+                                text-decoration: none;
+                                font-size: 14px;
+                                display: flex;
+                                align-items: center;
+                                transition: all 0.3s ease;
+                            " onmouseover="this.style.color='#60a5fa'; this.style.paddingLeft='8px'" onmouseout="this.style.color='#cbd5e1'; this.style.paddingLeft='0'">
+                                <i class="fas fa-paint-brush" style="margin-right: 8px; width: 16px;"></i>
+                                Web Design & Development
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="#" onclick="footerShowService('analytics')" style="
+                                color: #cbd5e1;
+                                text-decoration: none;
+                                font-size: 14px;
+                                display: flex;
+                                align-items: center;
+                                transition: all 0.3s ease;
+                            " onmouseover="this.style.color='#60a5fa'; this.style.paddingLeft='8px'" onmouseout="this.style.color='#cbd5e1'; this.style.paddingLeft='0'">
+                                <i class="fas fa-chart-bar" style="margin-right: 8px; width: 16px;"></i>
+                                Analytics Dashboards
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="#" onclick="footerShowService('ecommerce')" style="
+                                color: #cbd5e1;
+                                text-decoration: none;
+                                font-size: 14px;
+                                display: flex;
+                                align-items: center;
+                                transition: all 0.3s ease;
+                            " onmouseover="this.style.color='#60a5fa'; this.style.paddingLeft='8px'" onmouseout="this.style.color='#cbd5e1'; this.style.paddingLeft='0'">
+                                <i class="fas fa-shopping-cart" style="margin-right: 8px; width: 16px;"></i>
+                                E-commerce Solutions
+                            </a>
+                        </li>
+                        <li style="margin-bottom: 12px;">
+                            <a href="#" onclick="footerShowService('corporate')" style="
+                                color: #cbd5e1;
+                                text-decoration: none;
+                                font-size: 14px;
+                                display: flex;
+                                align-items: center;
+                                transition: all 0.3s ease;
+                            " onmouseover="this.style.color='#60a5fa'; this.style.paddingLeft='8px'" onmouseout="this.style.color='#cbd5e1'; this.style.paddingLeft='0'">
+                                <i class="fas fa-building" style="margin-right: 8px; width: 16px;"></i>
+                                Corporate Websites
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Contact Info -->
+                <div>
+                    <h4 style="
+                        margin: 0 0 20px 0;
+                        font-size: 16px;
+                        font-weight: 600;
+                        color: #f1f5f9;
+                    ">Get In Touch</h4>
+                    
+                    <div style="margin-bottom: 16px;">
+                        <div style="
+                            display: flex;
+                            align-items: center;
+                            margin-bottom: 8px;
+                            color: #cbd5e1;
+                            font-size: 14px;
+                        ">
+                            <i class="fas fa-envelope" style="margin-right: 12px; width: 16px; color: #60a5fa;"></i>
+                            <a href="mailto:info@sswebcraft.com" style="color: #cbd5e1; text-decoration: none;" onmouseover="this.style.color='#60a5fa'" onmouseout="this.style.color='#cbd5e1'">
+                                info@sswebcraft.com
+                            </a>
+                        </div>
+                        <div style="
+                            display: flex;
+                            align-items: center;
+                            margin-bottom: 8px;
+                            color: #cbd5e1;
+                            font-size: 14px;
+                        ">
+                            <i class="fas fa-phone" style="margin-right: 12px; width: 16px; color: #34d399;"></i>
+                            <a href="tel:+919876543210" style="color: #cbd5e1; text-decoration: none;" onmouseover="this.style.color='#34d399'" onmouseout="this.style.color='#cbd5e1'">
+                                +91 98765 43210
+                            </a>
+                        </div>
+                        <div style="
+                            display: flex;
+                            align-items: flex-start;
+                            color: #cbd5e1;
+                            font-size: 14px;
+                        ">
+                            <i class="fas fa-map-marker-alt" style="margin-right: 12px; width: 16px; color: #fb923c; margin-top: 2px;"></i>
+                            <span>Mumbai, Maharashtra, India</span>
+                        </div>
+                    </div>
+                    
+                    <div style="
+                        background: rgba(37, 99, 235, 0.1);
+                        border: 1px solid rgba(37, 99, 235, 0.2);
+                        border-radius: 8px;
+                        padding: 16px;
+                        margin-top: 20px;
+                    ">
+                        <h5 style="
+                            margin: 0 0 8px 0;
+                            color: #60a5fa;
+                            font-size: 14px;
+                            font-weight: 600;
+                        ">Start Your Project</h5>
+                        <p style="
+                            margin: 0 0 12px 0;
+                            color: #94a3b8;
+                            font-size: 12px;
+                            line-height: 1.5;
+                        ">Ready to bring your ideas to life? Let's discuss your next web project.</p>
+                        <button onclick="footerStartProject()" style="
+                            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+                            color: white;
+                            border: none;
+                            padding: 8px 16px;
+                            border-radius: 6px;
+                            font-size: 12px;
+                            font-weight: 500;
+                            cursor: pointer;
+                            transition: all 0.3s ease;
+                            width: 100%;
+                        " onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(37, 99, 235, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+                            Get Free Quote
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bottom Bar -->
+            <div style="
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                padding-top: 20px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 16px;
+            " id="footerBottom">
+                <div style="
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    color: #94a3b8;
+                    font-size: 14px;
+                ">
+                    <i class="fas fa-copyright" style="font-size: 12px;"></i>
+                    <span id="footerCurrentYear">2025</span>
+                    <strong style="color: #cbd5e1;">SS Webcraft Studio</strong>
+                    <span>• All rights reserved</span>
+                </div>
+                
+                <div style="
+                    display: flex;
+                    align-items: center;
+                    gap: 16px;
+                    color: #94a3b8;
+                    font-size: 14px;
+                ">
+                    <span>Designed & Developed by</span>
+                    <div style="
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        padding: 4px 12px;
+                        background: rgba(37, 99, 235, 0.1);
+                        border-radius: 20px;
+                        border: 1px solid rgba(37, 99, 235, 0.2);
+                    ">
+                        <div style="
+                            width: 24px;
+                            height: 24px;
+                            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 10px;
+                            font-weight: bold;
+                            color: white;
+                        ">T</div>
+                        <strong style="color: #60a5fa;">Tausif Shaikh</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
     
     <!-- Modals -->
-    <!-- Add Widget Modal -->
     <div class="modal-overlay" id="addWidgetModal">
         <div class="modal">
             <div class="modal-header">
@@ -1822,7 +2183,6 @@
         </div>
     </div>
     
-    <!-- Add User Modal -->
     <div class="modal-overlay" id="addUserModal">
         <div class="modal">
             <div class="modal-header">
@@ -1874,7 +2234,6 @@
         </div>
     </div>
     
-    <!-- Profile Modal -->
     <div class="modal-overlay" id="profileModal">
         <div class="modal">
             <div class="modal-header">
@@ -1910,9 +2269,7 @@
         </div>
     </div>
     
-    <!-- Toast Notifications -->
     <div id="toast" class="toast"></div>
-    
     
     <script>
         // Global Variables
@@ -1930,8 +2287,8 @@
             initializeCharts();
             startRealTimeUpdates();
             updateNotificationBadge();
+            adjustLayoutSpacing();
             
-            // Close dropdowns when clicking outside
             document.addEventListener('click', function(event) {
                 if (!event.target.closest('.notification-btn') && !event.target.closest('.notification-panel')) {
                     document.getElementById('notificationPanel').style.display = 'none';
@@ -1944,7 +2301,25 @@
             });
         });
         
-        // Show notification toast
+        // LAYOUT SPACING ADJUSTMENT - FIX FOR FOOTER OVERLAP
+        function adjustLayoutSpacing() {
+            const footer = document.querySelector('footer');
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            
+            if (footer && sidebar && mainContent) {
+                const footerHeight = footer.offsetHeight || 400;
+                const headerHeight = 64;
+                const spacing = 50;
+                
+                sidebar.style.height = `calc(100vh - ${headerHeight}px - ${footerHeight + spacing}px)`;
+                sidebar.style.maxHeight = `calc(100vh - ${headerHeight}px - ${footerHeight + spacing}px)`;
+                
+                mainContent.style.marginBottom = `${footerHeight + 30}px`;
+                mainContent.style.minHeight = `calc(100vh - ${headerHeight}px - ${footerHeight + 80}px)`;
+            }
+        }
+        
         function showNotification(message, type = 'info') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -1955,35 +2330,32 @@
             }, 3000);
         }
         
-        // Navigation Functions
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('mainContent');
             
             sidebar.classList.toggle('open');
             mainContent.classList.toggle('expanded');
+            
+            setTimeout(adjustLayoutSpacing, 300);
         }
         
         function showSection(sectionName) {
-            // Hide all sections
             const sections = document.querySelectorAll('.content-section');
             sections.forEach(section => {
                 section.classList.remove('active');
             });
             
-            // Show selected section
             const targetSection = document.getElementById(sectionName + '-section');
             if (targetSection) {
                 targetSection.classList.add('active');
             }
             
-            // Update navigation active state
             const navItems = document.querySelectorAll('.nav-item');
             navItems.forEach(item => {
                 item.classList.remove('active');
             });
             
-            // Find and activate the clicked nav item
             const activeItem = Array.from(navItems).find(item => 
                 item.onclick && item.onclick.toString().includes(sectionName)
             );
@@ -1993,7 +2365,6 @@
             
             currentSection = sectionName;
             
-            // Initialize section-specific charts
             if (sectionName === 'analytics') {
                 setTimeout(() => {
                     initializeAnalyticsCharts();
@@ -2001,7 +2372,6 @@
             }
         }
         
-        // Header Functions
         function toggleNotifications() {
             const panel = document.getElementById('notificationPanel');
             const isVisible = panel.style.display === 'block';
@@ -2010,7 +2380,6 @@
             isNotificationOpen = !isVisible;
             
             if (!isVisible) {
-                // Mark notifications as read when opened
                 setTimeout(() => {
                     const unreadItems = panel.querySelectorAll('.notification-item.unread');
                     unreadItems.forEach(item => {
@@ -2047,7 +2416,6 @@
             showNotification('All notifications marked as read', 'success');
         }
         
-        // User Profile Functions
         function logout() {
             if (confirm('Are you sure you want to logout?')) {
                 showNotification('Logging out...', 'info');
@@ -2065,7 +2433,6 @@
             alert('Help & Support\n\nFor technical support:\n• Email: support@analyticsprodindia.com\n• Phone: +91 1234 567 890\n• Documentation: Available in settings\n• Live Chat: Available during business hours');
         }
         
-        // Search Functions
         function performSearch(query) {
             const searchResults = document.getElementById('searchResults');
             
@@ -2079,7 +2446,6 @@
             }
             
             searchTimeout = setTimeout(() => {
-                // Simulate search results
                 const mockResults = [
                     { type: 'user', name: 'Priya Sharma', description: 'Active user from Mumbai' },
                     { type: 'report', name: 'Monthly Revenue Report', description: 'Financial analysis report' },
@@ -2117,7 +2483,6 @@
             searchInput.value = name;
             document.getElementById('searchResults').style.display = 'none';
             
-            // Navigate based on result type
             if (type === 'user') {
                 showSection('users');
             } else if (type === 'report') {
@@ -2129,7 +2494,6 @@
             showNotification(`Navigated to ${type}: ${name}`, 'success');
         }
         
-        // Modal Functions
         function openModal(modalId) {
             document.getElementById(modalId).classList.add('show');
         }
@@ -2161,7 +2525,6 @@
             closeModal('profileModal');
         }
         
-        // Widget Management
         function addWidget() {
             const type = document.getElementById('widgetType').value;
             const title = document.getElementById('widgetTitle').value;
@@ -2177,7 +2540,6 @@
             const kpiGrid = document.getElementById('kpiGrid');
             const widgetId = 'widget-' + Date.now();
             
-            // Generate random value based on source
             let value, change, changeClass;
             switch (source) {
                 case 'users':
@@ -2217,7 +2579,6 @@
             kpiGrid.insertAdjacentHTML('beforeend', widgetHTML);
             closeModal('addWidgetModal');
             
-            // Clear form
             document.getElementById('widgetTitle').value = '';
             
             showNotification('Widget added successfully!', 'success');
@@ -2233,7 +2594,6 @@
             }
         }
         
-        // User Management Functions
         function addUser() {
             const name = document.getElementById('userName').value;
             const email = document.getElementById('userEmail').value;
@@ -2277,7 +2637,6 @@
             userTableBody.insertAdjacentHTML('afterbegin', userHTML);
             closeModal('addUserModal');
             
-            // Clear form
             document.getElementById('userName').value = '';
             document.getElementById('userEmail').value = '';
             document.getElementById('userPhone').value = '';
@@ -2296,7 +2655,7 @@
         function deleteUser(userId) {
             if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
                 const userRow = document.querySelector(`[data-user="${userId}"]`);
-                if (userRow) {
+                                if (userRow) {
                     userRow.remove();
                     showNotification('User deleted successfully!', 'success');
                 }
@@ -2304,7 +2663,6 @@
         }
         
         function exportUsers() {
-            // Simulate export functionality
             const userRows = document.querySelectorAll('#userTableBody tr');
             let csvContent = 'Name,Email,Role,Status,Last Active\n';
             
@@ -2319,7 +2677,6 @@
                 csvContent += `"${name}","${email}","${role}","${status}","${lastActive}"\n`;
             });
             
-            // Create download
             const blob = new Blob([csvContent], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -2335,7 +2692,6 @@
         
         // Chart Functions
         function initializeCharts() {
-            // Traffic Chart
             const trafficCtx = document.getElementById('trafficChart').getContext('2d');
             trafficChart = new Chart(trafficCtx, {
                 type: 'line',
@@ -2396,7 +2752,6 @@
                 }
             });
             
-            // Source Chart (Doughnut)
             const sourceCtx = document.getElementById('sourceChart').getContext('2d');
             sourceChart = new Chart(sourceCtx, {
                 type: 'doughnut',
@@ -2432,7 +2787,6 @@
         }
         
         function initializeAnalyticsCharts() {
-            // Growth Chart
             const growthCtx = document.getElementById('growthChart');
             if (growthCtx && !growthChart) {
                 growthChart = new Chart(growthCtx.getContext('2d'), {
@@ -2473,7 +2827,6 @@
                 });
             }
             
-            // Regional Chart
             const regionalCtx = document.getElementById('regionalChart');
             if (regionalCtx && !regionalChart) {
                 regionalChart = new Chart(regionalCtx.getContext('2d'), {
@@ -2616,7 +2969,7 @@
         function downloadReport(reportType) {
             const reportTitles = {
                 'monthly': 'Monthly Performance Report',
-                'demographics': 'User Demographics Report',  
+                'demographics': 'User Demographics Report',
                 'revenue': 'Revenue Analysis Report',
                 'marketing': 'Marketing Campaign Report'
             };
@@ -2640,7 +2993,6 @@
             setInterval(() => {
                 updateKPIValues();
                 addNewActivity();
-                // Add new notification occasionally
                 if (Math.random() < 0.1) {
                     addNewNotification();
                 }
@@ -2702,7 +3054,6 @@
             
             tableBody.insertBefore(newRow, tableBody.firstChild);
             
-            // Keep only last 20 rows
             while (tableBody.children.length > 20) {
                 tableBody.removeChild(tableBody.lastChild);
             }
@@ -2737,7 +3088,6 @@
             notificationList.insertAdjacentHTML('afterbegin', notificationHTML);
             updateNotificationBadge();
             
-            // Keep only last 10 notifications
             const notification_items = notificationList.querySelectorAll('.notification-item');
             if (notification_items.length > 10) {
                 notification_items[notification_items.length - 1].remove();
@@ -2788,7 +3138,8 @@
                 row.style.display = found ? '' : 'none';
             }
         }
-                function sortTable(columnIndex) {
+        
+        function sortTable(columnIndex) {
             const table = document.querySelector('#activityTableBody').closest('table');
             const tbody = table.querySelector('tbody');
             const rows = Array.from(tbody.querySelectorAll('tr'));
@@ -2925,13 +3276,67 @@
             showNotification('Settings exported successfully!', 'success');
         }
         
+        // FOOTER JAVASCRIPT FUNCTIONS
+        function footerShowContact() {
+            alert('📞 Contact SS Webcraft Studio:\n\n📧 Email: info@sswebcraft.com\n📱 Phone: +91 98765 43210\n📍 Location: Mumbai, Maharashtra\n🌐 Web: www.sswebcraft.com\n\n🚀 Let\'s build something amazing together!');
+        }
+        
+        function footerShowService(service) {
+            const services = {
+                'web-design': '🎨 Web Design & Development\n\n✨ Custom website design\n⚡ Responsive development\n🎯 UI/UX optimization\n🔧 Performance tuning\n📱 Mobile-first approach',
+                'analytics': '📊 Analytics Dashboards\n\n📈 Real-time data visualization\n💡 Business intelligence\n🎯 KPI tracking\n📋 Custom reports\n⚡ Performance monitoring',
+                'ecommerce': '🛒 E-commerce Solutions\n\n💳 Payment integration\n📦 Inventory management\n🚀 Sales optimization\n📊 Analytics integration\n🔒 Secure checkout',
+                'corporate': '🏢 Corporate Websites\n\n💼 Professional design\n🌐 Multi-language support\n📱 Responsive layout\n🔒 Enterprise security\n📈 SEO optimization'
+            };
+            
+            alert(services[service] || 'Service information coming soon!');
+        }
+        
+        function footerStartProject() {
+            const projectTypes = ['Analytics Dashboard', 'E-commerce Store', 'Corporate Website', 'Custom Web App', 'Portfolio Website'];
+            const randomProject = projectTypes[Math.floor(Math.random() * projectTypes.length)];
+            
+            if (confirm(`🚀 Start your ${randomProject} project with SS Webcraft Studio?\n\n📋 What you get:\n• Free consultation & quote\n• Project timeline & milestones\n• Design mockups & prototypes\n• Full source code & documentation\n\n💡 Click OK to proceed or Cancel to explore more.`)) {
+                alert('🎉 Excellent choice!\n\n📞 Our team will contact you within 24 hours\n📧 Project details sent to your email\n💼 Portfolio and samples will be shared\n🚀 Let\'s build something amazing together!');
+            }
+        }
+        
         // Window resize handler
         window.addEventListener('resize', function() {
             if (trafficChart) trafficChart.resize();
             if (sourceChart) sourceChart.resize();
             if (growthChart) growthChart.resize();
             if (regionalChart) regionalChart.resize();
+            adjustLayoutSpacing();
         });
+        
+        // Initialize footer
+        window.addEventListener('load', function() {
+            document.getElementById('footerCurrentYear').textContent = new Date().getFullYear();
+            adjustFooterLayout();
+        });
+        
+        function adjustFooterLayout() {
+            const footerGrid = document.getElementById('footerGrid');
+            const footerBottom = document.getElementById('footerBottom');
+            
+            if (window.innerWidth <= 768) {
+                footerGrid.style.gridTemplateColumns = '1fr';
+                footerGrid.style.gap = '32px';
+                footerBottom.style.flexDirection = 'column';
+                footerBottom.style.textAlign = 'center';
+            } else if (window.innerWidth <= 1024) {
+                footerGrid.style.gridTemplateColumns = '1fr 1fr';
+                footerGrid.style.gap = '32px';
+                footerBottom.style.flexDirection = 'row';
+                footerBottom.style.textAlign = 'left';
+            } else {
+                footerGrid.style.gridTemplateColumns = '1fr 1fr 1fr';
+                footerGrid.style.gap = '40px';
+                footerBottom.style.flexDirection = 'row';
+                footerBottom.style.textAlign = 'left';
+            }
+        }
         
         // Keyboard shortcuts
         document.addEventListener('keydown', function(event) {
@@ -2952,10 +3357,294 @@
                 }
             }
         });
-    </script>
+
+        // CSV Import Function - Replace the openImportModal() function
+function openImportModal() {
+    // Create CSV import modal
+    const modalHTML = `
+        <div class="modal-overlay show" id="csvImportModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">Import CSV Data</div>
+                    <button class="modal-close" onclick="closeCsvImportModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">Select CSV File</label>
+                        <input type="file" class="form-input" id="csvFileInput" accept=".csv" onchange="previewCsvData(this)">
+                        <small style="color: #64748b;">Supported: Users CSV, Analytics CSV, Settings CSV</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Import Type</label>
+                        <select class="form-select" id="importType">
+                            <option value="users">User Data</option>
+                            <option value="analytics">Analytics Data</option>
+                            <option value="activities">Activity Log</option>
+                            <option value="settings">Dashboard Settings</option>
+                        </select>
+                    </div>
+                    
+                    <div id="csvPreview" style="display: none;">
+                        <label class="form-label">CSV Preview:</label>
+                        <div style="
+                            background: #f8fafc;
+                            border: 1px solid #e2e8f0;
+                            border-radius: 6px;
+                            padding: 12px;
+                            max-height: 200px;
+                            overflow: auto;
+                            font-family: monospace;
+                            font-size: 12px;
+                        " id="csvPreviewContent"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" id="replaceExisting" checked> Replace existing data
+                        </label>
+                        <small style="color: #64748b;">Uncheck to append data instead</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeCsvImportModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="processCsvImport()" id="importBtn" disabled>Import Data</button>
+                </div>
+            </div>
+        </div>
+    `;
     
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+function closeCsvImportModal() {
+    const modal = document.getElementById('csvImportModal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+function previewCsvData(input) {
+    const file = input.files[0];
+    const importBtn = document.getElementById('importBtn');
+    const preview = document.getElementById('csvPreview');
+    const previewContent = document.getElementById('csvPreviewContent');
+    
+    if (!file) {
+        importBtn.disabled = true;
+        preview.style.display = 'none';
+        return;
+    }
+    
+    if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
+        showNotification('Please select a valid CSV file', 'error');
+        input.value = '';
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const csvContent = e.target.result;
+        const lines = csvContent.split('\n').slice(0, 5); // Show first 5 lines
+        
+        previewContent.innerHTML = lines.map(line => 
+            `<div style="margin-bottom: 4px; padding: 2px; background: white; border-radius: 3px;">${line}</div>`
+        ).join('');
+        
+        preview.style.display = 'block';
+        importBtn.disabled = false;
+        
+        showNotification('CSV file loaded successfully', 'success');
+    };
+    
+    reader.readAsText(file);
+}
+
+function processCsvImport() {
+    const fileInput = document.getElementById('csvFileInput');
+    const importType = document.getElementById('importType').value;
+    const replaceExisting = document.getElementById('replaceExisting').checked;
+    
+    const file = fileInput.files[0];
+    if (!file) {
+        showNotification('Please select a CSV file', 'error');
+        return;
+    }
+    
+    showNotification('Processing CSV import...', 'info');
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const csvContent = e.target.result;
+        
+        try {
+            const parsedData = parseCsvContent(csvContent);
+            
+            switch (importType) {
+                case 'users':
+                    importUserData(parsedData, replaceExisting);
+                    break;
+                case 'analytics':
+                    importAnalyticsData(parsedData, replaceExisting);
+                    break;
+                case 'activities':
+                    importActivityData(parsedData, replaceExisting);
+                    break;
+                case 'settings':
+                    importSettingsData(parsedData, replaceExisting);
+                    break;
+                default:
+                    throw new Error('Invalid import type');
+            }
+            
+            closeCsvImportModal();
+            showNotification(`${importType} data imported successfully!`, 'success');
+            
+        } catch (error) {
+            showNotification(`Import failed: ${error.message}`, 'error');
+        }
+    };
+    
+    reader.readAsText(file);
+}
+
+function parseCsvContent(csvContent) {
+    const lines = csvContent.trim().split('\n');
+    const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+    const data = [];
+    
+    for (let i = 1; i < lines.length; i++) {
+        if (lines[i].trim()) {
+            const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+            const row = {};
+            
+            headers.forEach((header, index) => {
+                row[header] = values[index] || '';
+            });
+            
+            data.push(row);
+        }
+    }
+    
+    return { headers, data };
+}
+
+function importUserData(parsedData, replaceExisting) {
+    const userTableBody = document.getElementById('userTableBody');
+    
+    if (replaceExisting) {
+        userTableBody.innerHTML = '';
+    }
+    
+    const colors = ['#2563eb', '#059669', '#d97706', '#7c3aed', '#dc2626'];
+    
+    parsedData.data.forEach((user, index) => {
+        const userId = 'imported-user-' + Date.now() + '-' + index;
+        const initials = (user.Name || user.name || 'UN').split(' ').map(n => n[0]).join('').toUpperCase();
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        
+        const userHTML = `
+            <tr data-user="${userId}">
+                <td>
+                    <div class="user-avatar" style="width: 32px; height: 32px; font-size: 12px; background: ${randomColor};">${initials}</div>
+                </td>
+                <td>${user.Name || user.name || 'Unknown'}</td>
+                <td>${user.Email || user.email || 'No email'}</td>
+                <td>${user.Role || user.role || 'Viewer'}</td>
+                <td><span class="status-badge ${(user.Status || user.status || 'active').toLowerCase()}">${user.Status || user.status || 'Active'}</span></td>
+                <td>${user['Last Active'] || user.lastActive || 'Recently'}</td>
+                <td>
+                    <button class="btn btn-secondary" onclick="editUser('${userId}')" style="padding: 4px 8px; font-size: 12px;">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteUser('${userId}')" style="padding: 4px 8px; font-size: 12px; margin-left: 4px;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+        
+        userTableBody.insertAdjacentHTML('beforeend', userHTML);
+    });
+}
+
+function importActivityData(parsedData, replaceExisting) {
+    const activityTableBody = document.getElementById('activityTableBody');
+    
+    if (replaceExisting) {
+        activityTableBody.innerHTML = '';
+    }
+    
+    parsedData.data.forEach((activity) => {
+        const activityHTML = `
+            <tr>
+                <td>${activity.User || activity.user || 'Unknown User'}</td>
+                <td>${activity.Action || activity.action || 'Unknown Action'}</td>
+                <td>${activity.Date || activity.date || new Date().toISOString().slice(0, 16).replace('T', ' ')}</td>
+                <td><span class="status-badge ${(activity.Status || activity.status || 'completed').toLowerCase()}">${activity.Status || activity.status || 'Completed'}</span></td>
+                <td>${activity.Value || activity.value || '-'}</td>
+            </tr>
+        `;
+        
+        activityTableBody.insertAdjacentHTML('beforeend', activityHTML);
+    });
+}
+
+function importAnalyticsData(parsedData, replaceExisting) {
+    // Update KPI values from CSV data
+    parsedData.data.forEach((row) => {
+        if (row.Metric && row.Value) {
+            const metricName = row.Metric.toLowerCase().replace(/\s+/g, '');
+            
+            switch (metricName) {
+                case 'totalusers':
+                    document.getElementById('totalUsers').textContent = row.Value;
+                    break;
+                case 'revenue':
+                    document.getElementById('revenue').textContent = row.Value;
+                    break;
+                case 'conversionrate':
+                    document.getElementById('conversionRate').textContent = row.Value;
+                    break;
+                case 'bouncerate':
+                    document.getElementById('bounceRate').textContent = row.Value;
+                    break;
+            }
+        }
+    });
+}
+
+function importSettingsData(parsedData, replaceExisting) {
+    parsedData.data.forEach((setting) => {
+        if (setting.Setting && setting.Value) {
+            localStorage.setItem(setting.Setting, setting.Value);
+        }
+    });
+}
+
+// Export CSV function (bonus feature)
+function exportToCsv(data, filename) {
+    const csvContent = data.map(row => 
+        Object.values(row).map(value => 
+            typeof value === 'string' && value.includes(',') ? `"${value}"` : value
+        ).join(',')
+    ).join('\n');
+    
+    const headers = Object.keys(data[0]).join(',');
+    const fullCsvContent = headers + '\n' + csvContent;
+    
+    const blob = new Blob([fullCsvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+}
+
+    </script>
 </body>
 </html>
-
-        
 
